@@ -55,6 +55,46 @@ export class FriendshipRepository extends Repository {
     return this.change('remove_follower', id);
   }
 
+  async unfavorite(id: string | number) {
+    return this.changeFavorit('unfavorite', id);
+  }
+
+  async favorite(id: string | number) {
+    return this.changeFavorit('favorite', id);
+  }
+
+  async unfavoriteStories(id: string | number) {
+    return this.changeFavorit('unfavorite_for_stories', id);
+  }
+
+  async favoriteStories(id: string | number) {
+    return this.changeFavorit('favorite_for_stories', id);
+  }
+
+  async unfavoriteIgtv(id: string | number) {
+    return this.changeFavorit('unfavorite_for_igtv', id);
+  }
+
+  async favoriteIgtv(id: string | number) {
+    return this.changeFavorit('favorite_for_igtv', id);
+  }
+
+  private async changeFavorit(action: string, id: string | number) {
+    const { body } = await this.client.request.send<FriendshipRepositoryChangeResponseRootObject>({
+      url: `/api/v1/friendships/${action}/${id}/`,
+      method: 'POST',
+      form: this.client.request.sign({
+        _csrftoken: this.client.state.cookieCsrfToken,
+        user_id: id,
+        radio_type: this.client.state.radioType,
+        _uid: this.client.state.cookieUserId,
+        device_id: this.client.state.deviceId,
+        _uuid: this.client.state.uuid,
+      }),
+    });
+    return body;
+  }
+
   private async change(action: string, id: string | number, mediaIdAttribution?: string) {
     const { body } = await this.client.request.send<FriendshipRepositoryChangeResponseRootObject>({
       url: `/api/v1/friendships/${action}/${id}/`,
